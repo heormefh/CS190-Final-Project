@@ -81,7 +81,7 @@ public class NeteaseAuth {
 
         System.out.println("Java songs count: " + songs.size());
 
-        return new Playlist(playlistName, songs);
+        return new Playlist(playlistId, playlistName, songs);
     }
     private String getPlaylistDetail(long id)
         throws IOException, InterruptedException {

@@ -2,19 +2,27 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 import java.awt.BorderLayout;
 import javax.swing.SwingUtilities;
 import java.util.ArrayList;
 import java.awt.Font;
 public class GUI {
-    private static Playlist pl = new Playlist("the playlist", new ArrayList<>());
+    private static Playlist pl = new Playlist(1, "emty playlist", new ArrayList<>());
     private static Playlist backup = pl.backup();
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
+            
+            // content
             JLabel message = new JLabel("Please select operation");
+            JPanel content = new JPanel();
+            JTextField idInput = new JTextField("Input Playlist ID Here", 15);
+            content.add(idInput);
+	    content.add(message);
             NeteaseAuth auth = new NeteaseAuth();
             try {
-                pl = auth.getPlaylist(18400972350L);
+                pl = auth.getPlaylist(Long.parseLong(idInput.getText()));
+
                 System.out.println("Playlist: " + pl.getName());
                 System.out.println("Songs: " + pl.getSize());
                 backup = pl.backup();
@@ -31,12 +39,6 @@ public class GUI {
             header.add(headerTitle, BorderLayout.NORTH);
             header.add(playlistInfo, BorderLayout.SOUTH);
 
-            // content
-            
-            JPanel content = new JPanel();
-            content.add(message);
-
-
             // buttons
             JButton backupButton = new JButton("Backup");
             backupButton.addActionListener(e -> {
@@ -47,7 +49,21 @@ public class GUI {
             compareButton.addActionListener(e -> {
                 message.setText(pl.compareWith(backup));
             });
+            
             JButton refreshButton = new JButton("Refresh");
+            refreshButton.addActionListener(e -> {
+                try {
+                    long playlistID = Long.parseLong(idInput.getText());
+                    message.setText("Playlist Refreshing");
+
+                    pl = auth.getPlaylist(playlistID);
+                    playlistInfo.setText("Your Playlist: " + pl.getName() + " | " + pl.getSize() + " songs");
+                    message.setText("Playlist refreshed successfully!");
+                } catch (Exception ex) {
+                    message.setText("Playlist refresh failed");
+                    ex.printStackTrace();
+                }
+            });
             JPanel buttons = new JPanel();
             buttons.add(backupButton);
             buttons.add(compareButton);
@@ -63,4 +79,3 @@ public class GUI {
         });   
     }
 }
-

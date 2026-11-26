@@ -2,15 +2,17 @@ import java.util.ArrayList;
 public class Playlist {
 
     // Fields
+    private long id;
     private String name;
     private int size;
     private ArrayList<Song> songs;
 
     // Constructor
-    public Playlist(String name, ArrayList<Song> songs) {
-        this.name = name;
+    public Playlist(long id, String name, ArrayList<Song> songs) {
+        this.id = id;
+	this.name = name;
         this.songs = songs;
-	this.size = this.songs.size();
+	    this.size = this.songs.size();
     }
 
     // Getters
@@ -48,7 +50,7 @@ public class Playlist {
 
     // Backup
     public Playlist backup() {
-        Playlist backup = new Playlist(name + " (backup)", songs);
+        Playlist backup = new Playlist(-1, name + " (backup)", songs);
         return backup;
     }
     
