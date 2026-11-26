@@ -9,8 +9,8 @@ public class Playlist {
     // Constructor
     public Playlist(String name, ArrayList<Song> songs) {
         this.name = name;
-        size = 0;
-        songs = songs;
+        this.songs = songs;
+	this.size = this.songs.size();
     }
 
     // Getters
@@ -20,7 +20,9 @@ public class Playlist {
     public int getSize() {
         return size;
     }
-
+    public ArrayList<Song> getSongs() {
+	return songs;
+    }
     // Add & remove
     public String addSong(Song s) {
         songs.add(s);
@@ -46,10 +48,7 @@ public class Playlist {
 
     // Backup
     public Playlist backup() {
-        Playlist backup = new Playlist(name + " (backup)", new ArrayList<>());
-        for (int i = 0; i < size; i++) {
-            backup.addSong(songs.get(i));
-        }
+        Playlist backup = new Playlist(name + " (backup)", songs);
         return backup;
     }
     

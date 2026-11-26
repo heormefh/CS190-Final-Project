@@ -11,7 +11,17 @@ public class GUI {
     private static Playlist backup = pl.backup();
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-
+            JLabel message = new JLabel("Please select operation");
+            NeteaseAuth auth = new NeteaseAuth();
+            try {
+                pl = auth.getPlaylist(18400972350L);
+                System.out.println("Playlist: " + pl.getName());
+                System.out.println("Songs: " + pl.getSize());
+                backup = pl.backup();
+            } catch (Exception e) {
+                message.setText("Authorization Failed");
+                e.printStackTrace();
+            }
             // header
             JLabel headerTitle = new JLabel("NetEase Playlist Manager");
             headerTitle.setFont(new Font("Arial", Font.BOLD, 30));
@@ -22,7 +32,7 @@ public class GUI {
             header.add(playlistInfo, BorderLayout.SOUTH);
 
             // content
-            JLabel message = new JLabel("Please select operation");
+            
             JPanel content = new JPanel();
             content.add(message);
 
@@ -50,10 +60,7 @@ public class GUI {
             frame.setSize(800, 500);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
-        });
-
-        
+        });   
     }
-    
 }
 
