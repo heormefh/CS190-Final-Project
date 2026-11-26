@@ -1,12 +1,27 @@
-public class PlayList {
-    String name;
-    int size;
-    ArrayList<Song> songs;
-    public Playlist(String name ArrayList<Song> songs) {
+import java.util.ArrayList;
+public class Playlist {
+
+    // Fields
+    private String name;
+    private int size;
+    private ArrayList<Song> songs;
+
+    // Constructor
+    public Playlist(String name, ArrayList<Song> songs) {
         this.name = name;
         size = 0;
         songs = songs;
     }
+
+    // Getters
+    public String getName() {
+        return name;
+    }
+    public int getSize() {
+        return size;
+    }
+
+    // Add & remove
     public String addSong(Song s) {
         songs.add(s);
         size = songs.size();
@@ -28,13 +43,17 @@ public class PlayList {
         
         return "Song not found";
     }
-    public PlayList backup() {
-        PlayList backup = new Playlist(name + " (backup)");
+
+    // Backup
+    public Playlist backup() {
+        Playlist backup = new Playlist(name + " (backup)", new ArrayList<>());
         for (int i = 0; i < size; i++) {
             backup.addSong(songs.get(i));
         }
         return backup;
     }
+    
+    // Compare two playlists
     public String compareWith(Playlist p) {
         ArrayList<Song> removed = new ArrayList<>();
         ArrayList<Song> added = new ArrayList<>();
@@ -44,14 +63,15 @@ public class PlayList {
                 added.add(song);
             }
         }
-
         for (Song song : p.songs) {
             if (!this.songs.contains(song)) {
                 removed.add(song);
             }
         }
+
         String inThis = "";
         String inP= "";
+
         for (Song song : added) {
             inThis += song.name + ", ";
         }
