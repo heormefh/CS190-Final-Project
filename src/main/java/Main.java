@@ -41,7 +41,6 @@ public class Main {
             header.add(headerTitle, BorderLayout.NORTH);
             header.add(playlistInfo, BorderLayout.SOUTH);
 
-
             // buttons
             JButton backupButton = new JButton("Backup");
             backupButton.addActionListener(e -> {
@@ -50,10 +49,10 @@ public class Main {
             });
             JButton compareButton = new JButton("Compare");
             compareButton.addActionListener(e -> {
-		if (backup == null || pl == null) {
-		    message.setText("Playlist or Backup not initialized!");
-		    return;
-		}
+                if (backup == null || pl == null) {
+                    message.setText("Playlist or Backup not initialized!");
+                    return;
+                }
                 message.setText(pl.compareWith(backup));
             });
             
@@ -113,5 +112,4 @@ public class Main {
         });   
     };
 }
-
 

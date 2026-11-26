@@ -27,9 +27,7 @@ public class NeteaseAuth {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(BASE_URL + "/login/status"))
             .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(
-                "{\"cookie\":\"" + COOKIE + "\"}"
-            ))
+            .POST(HttpRequest.BodyPublishers.ofString("{\"cookie\":\"" + COOKIE + "\"}"))
             .build();
 
         HttpResponse<String> response = client.send(
@@ -42,32 +40,23 @@ public class NeteaseAuth {
     public Playlist getPlaylist(long playlistId)
         throws IOException, InterruptedException {
         String detailJson = getPlaylistDetail(playlistId);
-        JsonObject detailRoot =
-            JsonParser.parseString(detailJson).getAsJsonObject();
+        JsonObject detailRoot = JsonParser.parseString(detailJson).getAsJsonObject();
 
-        JsonObject playlistJson =
-            detailRoot.getAsJsonObject("playlist");
+        JsonObject playlistJson = detailRoot.getAsJsonObject("playlist");
 
-        String playlistName =
-            playlistJson.get("name").getAsString();
+        String playlistName = playlistJson.get("name").getAsString();
 
         String tracksJson = getAllTracks(playlistId);
 
-        JsonObject tracksRoot =
-            JsonParser.parseString(tracksJson).getAsJsonObject();
+        JsonObject tracksRoot = JsonParser.parseString(tracksJson).getAsJsonObject();
 
         // Debug information
-        System.out.println("API response code: "
-            + tracksRoot.get("code"));
+        System.out.println("API response code: " + tracksRoot.get("code"));
 
-        System.out.println("API response: "
-            + tracksRoot);
+        System.out.println("API response: " + tracksRoot);
 
-        if (!tracksRoot.has("songs")
-                || !tracksRoot.get("songs").isJsonArray()) {
-            throw new IOException(
-                "API response does not contain a songs array."
-            );
+        if (!tracksRoot.has("songs") || !tracksRoot.get("songs").isJsonArray()) {
+            throw new IOException("API response does not contain a songs array.");
         }
 
         JsonArray tracks = tracksRoot.getAsJsonArray("songs");
@@ -103,11 +92,10 @@ public class NeteaseAuth {
         body.addProperty("cookie", COOKIE);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + endpoint
-                        + "?timestamp=" + System.currentTimeMillis()))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
-                .build();
+            .uri(URI.create(BASE_URL + endpoint + "?timestamp=" + System.currentTimeMillis()))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+            .build();
 
         HttpResponse<String> response = client.send(
                 request, HttpResponse.BodyHandlers.ofString()
@@ -115,14 +103,8 @@ public class NeteaseAuth {
 
         return response.body();
     }
-    public String sendPlaylistOperation(
-            String operation, long playlistId, ArrayList<Song> songs)
-            throws IOException, InterruptedException {
-
-        //if (songs.isEmpty()) {
-          //  return "Empty Playlist";
-        //}
-
+    public String sendPlaylistOperation(String operation, long playlistId, ArrayList<Song> songs)
+        throws IOException, InterruptedException {
         StringBuilder ids = new StringBuilder();
 
         for (Song song : songs) {
@@ -142,8 +124,7 @@ public class NeteaseAuth {
         body.addProperty("cookie", COOKIE);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/playlist/tracks"
-                        + "?timestamp=" + System.currentTimeMillis()))
+                .uri(URI.create(BASE_URL + "/playlist/tracks" + "?timestamp=" + System.currentTimeMillis()))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
@@ -152,20 +133,5 @@ public class NeteaseAuth {
                 request, HttpResponse.BodyHandlers.ofString()
         );
         return response.body();
-    }
-    public static void main(String[] args) {
-        NeteaseAuth auth = new NeteaseAuth();
-        try {
-            Playlist playlist = auth.getPlaylist(18400972350L);
-            System.out.println("Playlist: " + playlist.getName());
-            System.out.println("Songs: " + playlist.getSize());
-
-            for (Song song : playlist.getSongs()) {
-                System.out.println(song.getName());
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
