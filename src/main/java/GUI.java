@@ -18,7 +18,7 @@ public class GUI {
             JPanel content = new JPanel();
             JTextField idInput = new JTextField("Input Playlist ID Here", 15);
             content.add(idInput);
-	    content.add(message);
+            content.add(message);
             NeteaseAuth auth = new NeteaseAuth();
             try {
                 pl = auth.getPlaylist(Long.parseLong(idInput.getText()));
@@ -64,10 +64,32 @@ public class GUI {
                     ex.printStackTrace();
                 }
             });
+
+            JButton overwriteButton = new JButton("Overwrite");
+            overwriteButton.addActionListener(e -> {
+                if (pl == null || backup == null) {
+                    message.setText("Playlist or backup is missing!");
+                    return;
+                }
+                
+                try {
+                    String deleteResponse = auth.sendPlaylistOperation("del", pl.getId(), pl.getSongs());
+                    String addResponse = auth.sendPlaylistOperation("add", pl.getId(), backup.getSongs());
+                    pl = auth.getPlaylist(pl.getId());
+                    playlistInfo.setText("Your Playlist: " + pl.getName() + " | " + pl.getSize() + " songs");
+                    
+                    System.out.println("Add response: " + addResponse);
+
+                } catch (Exception ex) {
+                    message.setText("Overwrite failed!");
+                    ex.printStackTrace();
+                }
+            });
             JPanel buttons = new JPanel();
             buttons.add(backupButton);
             buttons.add(compareButton);
             buttons.add(refreshButton);
+            buttons.add(overwriteButton);
             // frame
             JFrame frame = new JFrame("Netease Playlist Manager");
             frame.add(header, BorderLayout.NORTH);

@@ -10,12 +10,15 @@ public class Playlist {
     // Constructor
     public Playlist(long id, String name, ArrayList<Song> songs) {
         this.id = id;
-	this.name = name;
+        this.name = name;
         this.songs = songs;
 	    this.size = this.songs.size();
     }
 
     // Getters
+    public long getId() {
+        return id;
+    }
     public String getName() {
         return name;
     }
@@ -23,7 +26,11 @@ public class Playlist {
         return size;
     }
     public ArrayList<Song> getSongs() {
-	return songs;
+	    return songs;
+    }
+    public void setSongs(ArrayList<Song> songs) {
+        this.songs = new ArrayList<Song>(songs);
+        this.size = this.songs.size();
     }
     // Add & remove
     public String addSong(Song s) {
@@ -50,7 +57,7 @@ public class Playlist {
 
     // Backup
     public Playlist backup() {
-        Playlist backup = new Playlist(-1, name + " (backup)", songs);
+        Playlist backup = new Playlist(id, name + " (backup)", new ArrayList<>(this.songs));
         return backup;
     }
     

@@ -112,13 +112,13 @@ public class NeteaseAuth {
 
         return response.body();
     }
-    public void sendPlaylistOperation(
+    public String sendPlaylistOperation(
             String operation, long playlistId, ArrayList<Song> songs)
             throws IOException, InterruptedException {
 
-        if (songs.isEmpty()) {
-            return;
-        }
+        //if (songs.isEmpty()) {
+          //  return "Empty Playlist";
+        //}
 
         StringBuilder ids = new StringBuilder();
 
@@ -128,7 +128,10 @@ public class NeteaseAuth {
             }
             ids.append(song.getId());
         }
-
+        System.out.println("Operation: " + operation);
+        System.out.println("Playlist ID: " + playlistId);
+        System.out.println("Tracks: " + ids);
+        System.out.println("Song count: " + songs.size());
         JsonObject body = new JsonObject();
         body.addProperty("op", operation);
         body.addProperty("pid", playlistId);
@@ -145,7 +148,7 @@ public class NeteaseAuth {
         HttpResponse<String> response = client.send(
                 request, HttpResponse.BodyHandlers.ofString()
         );
-        System.out.println(operation + ": " + response.body());
+        return response.body();
     }
     public static void main(String[] args) {
         NeteaseAuth auth = new NeteaseAuth();
