@@ -1,58 +1,104 @@
-import com.google.gson.Gson;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
+import javax.swing.SwingUtilities;
 import java.util.ArrayList;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
-
+import java.awt.Font;
 public class Main {
-    public static void main(String[] args) throws Exception {
+    private static Playlist pl = new Playlist(1, "emty playlist", new ArrayList<>());
+    private static Playlist backup = pl.backup();
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            
+            // content
+            JLabel message = new JLabel("Please select operation");
+            JPanel content = new JPanel();
+            JTextField idInput = new JTextField("Input Playlist ID Here", 15);
+            content.add(idInput);
+            content.add(message);
+            NeteaseAuth auth = new NeteaseAuth();
+            try {
+                pl = auth.getPlaylist(Long.parseLong(idInput.getText()));
 
-        // 1. Create HttpClient
-        HttpClient client = HttpClient.newHttpClient();
+                System.out.println("Playlist: " + pl.getName());
+                System.out.println("Songs: " + pl.getSize());
+                backup = pl.backup();
+            } catch (Exception e) {
+                message.setText("Authorization Failed");
+                e.printStackTrace();
+            }
+            // header
+            JLabel headerTitle = new JLabel("NetEase Playlist Manager");
+            headerTitle.setFont(new Font("Arial", Font.BOLD, 30));
+            JLabel playlistInfo = new JLabel("Your Playlist : " + pl.getName() + " | " + pl.getSize() + " songs");
+            playlistInfo.setFont(new Font("Arial", Font.BOLD, 24));
+            JPanel header = new JPanel(new BorderLayout());
+            header.add(headerTitle, BorderLayout.NORTH);
+            header.add(playlistInfo, BorderLayout.SOUTH);
 
-        // 2. Create HTTP request
-        String url = "http://localhost:3000/playlist/detail?id=18400972350";
+            // buttons
+            JButton backupButton = new JButton("Backup");
+            backupButton.addActionListener(e -> {
+                backup = pl.backup();
+                message.setText(backup.getName() + " updated!");
+            });
+            JButton compareButton = new JButton("Compare");
+            compareButton.addActionListener(e -> {
+                message.setText(pl.compareWith(backup));
+            });
+            
+            JButton refreshButton = new JButton("Refresh");
+            refreshButton.addActionListener(e -> {
+                try {
+                    long playlistID = Long.parseLong(idInput.getText());
+                    message.setText("Playlist Refreshing");
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .build();
+                    pl = auth.getPlaylist(playlistID);
+                    playlistInfo.setText("Your Playlist: " + pl.getName() + " | " + pl.getSize() + " songs");
+                    message.setText("Playlist refreshed successfully!");
+                } catch (Exception ex) {
+                    message.setText("Playlist refresh failed");
+                    ex.printStackTrace();
+                }
+            });
 
-        // 3. Send request and receive response
-        HttpResponse<String> response = client.send(
-                request,
-                HttpResponse.BodyHandlers.ofString()
-        );
+            JButton overwriteButton = new JButton("Overwrite");
+            overwriteButton.addActionListener(e -> {
+                if (pl == null || backup == null) {
+                    message.setText("Playlist or backup is missing!");
+                    return;
+                }
+                
+                try {
+                    String deleteResponse = auth.sendPlaylistOperation("del", pl.getId(), pl.getSongs());
+                    String addResponse = auth.sendPlaylistOperation("add", pl.getId(), backup.getSongs());
+                    pl = auth.getPlaylist(pl.getId());
+                    playlistInfo.setText("Your Playlist: " + pl.getName() + " | " + pl.getSize() + " songs");
+                    
+                    System.out.println("Add response: " + addResponse);
 
-        // 4. Store JSON response
-        String jsonText = response.body();
-
-        // 5. Parse JSON
-        JsonObject root = JsonParser.parseString(jsonText)
-                .getAsJsonObject();
-
-        JsonObject playlist = root.getAsJsonObject("playlist");
-
-        JsonArray tracks = playlist.getAsJsonArray("tracks");
-
-        // 6. Print number of songs
-        System.out.println("Number of songs: " + tracks.size());
-	Gson gson = new Gson();
-
-	ArrayList<Song> songs = new ArrayList<>();
-
-        for (int i = 0; i < tracks.size(); i++) {
-            JsonObject track = tracks.get(i).getAsJsonObject();
-    
-            Song song = gson.fromJson(track, Song.class);
-
-            songs.add(song);
-        }	
+                } catch (Exception ex) {
+                    message.setText("Overwrite failed!");
+                    ex.printStackTrace();
+                }
+            });
+            JPanel buttons = new JPanel();
+            buttons.add(backupButton);
+            buttons.add(compareButton);
+            buttons.add(refreshButton);
+            buttons.add(overwriteButton);
+            // frame
+            JFrame frame = new JFrame("Netease Playlist Manager");
+            frame.add(header, BorderLayout.NORTH);
+            frame.add(content, BorderLayout.CENTER);
+            frame.add(buttons, BorderLayout.SOUTH);
+            frame.setSize(800, 500);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
+        });   
     }
 }
 
