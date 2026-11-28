@@ -30,15 +30,10 @@ public class NeteaseAuth {
             .POST(HttpRequest.BodyPublishers.ofString("{\"cookie\":\"" + COOKIE + "\"}"))
             .build();
 
-        HttpResponse<String> response = client.send(
-            request,
-            HttpResponse.BodyHandlers.ofString()
-        );
-
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
     }
-    public Playlist getPlaylist(long playlistId)
-        throws IOException, InterruptedException {
+    public Playlist getPlaylist(long playlistId) throws IOException, InterruptedException {
         String detailJson = getPlaylistDetail(playlistId);
         JsonObject detailRoot = JsonParser.parseString(detailJson).getAsJsonObject();
 
@@ -75,17 +70,14 @@ public class NeteaseAuth {
 
         return new Playlist(playlistId, playlistName, songs);
     }
-    private String getPlaylistDetail(long id)
-        throws IOException, InterruptedException {
+    private String getPlaylistDetail(long id) throws IOException, InterruptedException {
         return postRequest("/playlist/detail", id);
     }
 
-    private String getAllTracks(long id)
-            throws IOException, InterruptedException {
+    private String getAllTracks(long id) throws IOException, InterruptedException {
         return postRequest("/playlist/track/all", id);
     }
-    private String postRequest(String endpoint, long id)
-        throws IOException, InterruptedException {
+    private String postRequest(String endpoint, long id) throws IOException, InterruptedException {
 
         JsonObject body = new JsonObject();
         body.addProperty("id", id);
@@ -103,10 +95,8 @@ public class NeteaseAuth {
 
         return response.body();
     }
-    public String sendPlaylistOperation(String operation, long playlistId, ArrayList<Song> songs)
-        throws IOException, InterruptedException {
+    public String sendPlaylistOperation(String operation, long playlistId, ArrayList<Song> songs) throws IOException, InterruptedException {
         StringBuilder ids = new StringBuilder();
-
         for (Song song : songs) {
             if (ids.length() > 0) {
                 ids.append(",");
@@ -129,9 +119,7 @@ public class NeteaseAuth {
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
 
-        HttpResponse<String> response = client.send(
-                request, HttpResponse.BodyHandlers.ofString()
-        );
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return response.body();
     }
 }
